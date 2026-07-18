@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Downloader</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>📥 YouTube Downloader</h1>
+        <p class="subtitle">Paste any YouTube URL and download in your quality</p>
+        
+        <div class="input-group">
+            <input type="text" id="url-input" placeholder="Paste YouTube URL here...">
+            <button id="fetch-btn">🔍 Get Video</button>
+        </div>
+        
+        <div id="loading">
+            <div class="spinner"></div>
+            <div>Fetching video info...</div>
+        </div>
+        
+        <div id="video-info">
+            <img id="thumbnail" src="" alt="Video thumbnail">
+            <div id="video-title">Video Title</div>
+            <div class="quality-grid" id="quality-grid"></div>
+            <button id="download-btn">⬇️ Download Selected Quality</button>
+        </div>
+        
+        <div id="error" class="error"></div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
