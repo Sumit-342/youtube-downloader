@@ -1,6 +1,9 @@
 let selectedFormat = null;
 let currentUrl = null;
+let downloadId = null;
+let progressInterval = null;
 
+// ===== FETCH VIDEO INFO =====
 document.getElementById('fetch-btn').addEventListener('click', async () => {
     const url = document.getElementById('url-input').value.trim();
     if (!url) {
@@ -14,6 +17,7 @@ document.getElementById('fetch-btn').addEventListener('click', async () => {
     document.getElementById('video-info').style.display = 'none';
     document.getElementById('error').style.display = 'none';
     document.getElementById('download-btn').disabled = true;
+    document.getElementById('progress-container').style.display = 'none';
     
     try {
         const response = await fetch('/api/info', {
@@ -37,6 +41,7 @@ document.getElementById('fetch-btn').addEventListener('click', async () => {
     }
 });
 
+// ===== DISPLAY VIDEO INFO =====
 function displayVideoInfo(data) {
     document.getElementById('video-info').style.display = 'block';
     document.getElementById('thumbnail').src = data.thumbnail || 'https://via.placeholder.com/480x360?text=No+Thumbnail';
@@ -70,6 +75,9 @@ function displayVideoInfo(data) {
         grid.appendChild(btn);
     });
     
+    // Update quality count
+    document.getElementById('quality-count').textContent = `${data.formats.length} formats`;
+    
     // Select first quality by default
     const firstBtn = grid.querySelector('.quality-btn');
     if (firstBtn) {
@@ -79,6 +87,7 @@ function displayVideoInfo(data) {
     document.getElementById('download-btn').disabled = false;
 }
 
+// ===== START DOWNLOAD =====
 document.getElementById('download-btn').addEventListener('click', async () => {
     if (!selectedFormat) {
         showError('Please select a quality first');
@@ -92,8 +101,12 @@ document.getElementById('download-btn').addEventListener('click', async () => {
     
     try {
         document.getElementById('download-btn').disabled = true;
-        document.getElementById('download-btn').textContent = '⏳ Downloading...';
+        document.getElementById('download-btn').textContent = '⏳ Starting download...';
+        document.getElementById('progress-container').style.display = 'block';
+        document.getElementById('progress-bar').style.width = '0%';
+        document.getElementById('progress-text').textContent = 'Initializing...';
         
+        // Start the download
         const response = await fetch('/api/download', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -106,6 +119,84 @@ document.getElementById('download-btn').addEventListener('click', async () => {
         if (!response.ok) {
             const error = await response.json();
             throw new Error(error.detail || 'Download failed');
+        }
+        
+        const data = await response.json();
+        downloadId = data.download_id;
+        
+        // Start polling for progress
+        document.getElementById('download-btn').textContent = '⏳ Downloading... 0%';
+        startProgressPolling();
+        
+    } catch (error) {
+        showError(error.message || 'Download failed. Please try again.');
+        document.getElementById('download-btn').disabled = false;
+        document.getElementById('download-btn').textContent = '⬇️ Download Selected Quality';
+        document.getElementById('progress-container').style.display = 'none';
+    }
+});
+
+// ===== PROGRESS POLLING =====
+function startProgressPolling() {
+    if (progressInterval) {
+        clearInterval(progressInterval);
+    }
+    
+    progressInterval = setInterval(async () => {
+        try {
+            const response = await fetch(`/api/progress/${downloadId}`);
+            if (!response.ok) {
+                throw new Error('Failed to get progress');
+            }
+            
+            const progress = await response.json();
+            
+            if (progress.status === 'downloading') {
+                const percent = progress.percent || 0;
+                document.getElementById('download-btn').textContent = `⏳ Downloading... ${percent}%`;
+                
+                // Update progress bar
+                document.getElementById('progress-bar').style.width = `${percent}%`;
+                document.getElementById('progress-text').textContent = `Downloading... ${percent}%`;
+                
+            } else if (progress.status === 'finished') {
+                clearInterval(progressInterval);
+                progressInterval = null;
+                
+                document.getElementById('download-btn').textContent = '✅ Processing...';
+                document.getElementById('progress-text').textContent = 'Processing... 100%';
+                document.getElementById('progress-bar').style.width = '100%';
+                
+                // Download the file
+                setTimeout(async () => {
+                    await downloadCompletedFile();
+                }, 500);
+                
+            } else if (progress.status === 'error') {
+                clearInterval(progressInterval);
+                progressInterval = null;
+                throw new Error(progress.error || 'Download failed');
+            }
+            
+        } catch (error) {
+            clearInterval(progressInterval);
+            progressInterval = null;
+            showError(error.message || 'Failed to track progress');
+            document.getElementById('download-btn').disabled = false;
+            document.getElementById('download-btn').textContent = '⬇️ Download Selected Quality';
+            document.getElementById('progress-container').style.display = 'none';
+        }
+    }, 1000);
+}
+
+// ===== DOWNLOAD COMPLETED FILE =====
+async function downloadCompletedFile() {
+    try {
+        const response = await fetch(`/api/download-file/${downloadId}`);
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || 'Failed to download file');
         }
         
         // Get the filename from Content-Disposition header
@@ -127,18 +218,25 @@ document.getElementById('download-btn').addEventListener('click', async () => {
         URL.revokeObjectURL(link.href);
         
         document.getElementById('download-btn').textContent = '✅ Downloaded!';
+        document.getElementById('progress-text').textContent = '✅ Download complete!';
+        
+        // Reset UI after delay
         setTimeout(() => {
+            document.getElementById('progress-container').style.display = 'none';
+            document.getElementById('progress-bar').style.width = '0%';
             document.getElementById('download-btn').textContent = '⬇️ Download Selected Quality';
             document.getElementById('download-btn').disabled = false;
         }, 3000);
         
     } catch (error) {
-        showError(error.message || 'Download failed. Please try again.');
+        showError(error.message || 'Failed to download file');
         document.getElementById('download-btn').disabled = false;
         document.getElementById('download-btn').textContent = '⬇️ Download Selected Quality';
+        document.getElementById('progress-container').style.display = 'none';
     }
-});
+}
 
+// ===== SHOW ERROR =====
 function showError(message) {
     const errorDiv = document.getElementById('error');
     errorDiv.textContent = message;
@@ -148,7 +246,7 @@ function showError(message) {
     }, 5000);
 }
 
-// Enter key to submit
+// ===== ENTER KEY TO SUBMIT =====
 document.getElementById('url-input').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
         document.getElementById('fetch-btn').click();

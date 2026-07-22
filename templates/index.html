@@ -18,7 +18,7 @@
             <div class="nav-links">
                 <a href="#features">Features</a>
                 <a href="#about">About</a>
-                <button class="nav-btn">⭐ Star on GitHub</button>
+                <button class="nav-btn" onclick="window.open('https://github.com/Sumit-342/youtube-downloader' , '_blank')">⭐ Star on GitHub</button>
             </div>
         </div>
     </nav>
@@ -86,6 +86,14 @@
                 <button id="download-btn" class="btn-download">
                     <span>⬇️ Download Selected Quality</span>
                 </button>
+
+                <!-- Progress Bar -->
+                <div id="progress-container" style="display: none; margin-top: 16px;">
+                    <div class="progress-track">
+                        <div id="progress-bar" class="progress-fill" style="width: 0%;"></div>
+                    </div>
+                    <p id="progress-text" style="font-size: 13px; color: #808090; margin-top: 6px; text-align: center;">Downloading...</p>
+                </div>
             </div>
 
             <div id="error" class="error"></div>
@@ -124,7 +132,7 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-container">
-            <p>Built with ❤️ by <span class="gradient-text">You</span></p>
+            <p>Built with ❤️ by <span class="gradient-text">Sumit</span></p>
             <p class="footer-sub">📥 YouTube Downloader • Open Source • Free Forever</p>
         </div>
     </footer>
