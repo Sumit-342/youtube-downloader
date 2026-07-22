@@ -51,6 +51,8 @@ input[type="text"] {
     font-size: 16px;
     outline: none;
     transition: border-color 0.3s;
+    color: #333;
+    background: white;
 }
 
 input[type="text"]:focus {
@@ -137,25 +139,34 @@ button:disabled {
 }
 
 .quality-btn {
-    padding: 10px;
+    padding: 10px 8px;
     background: white;
-    border: 2px solid #e0e0e0;
+    border: 2px solid #d0d0d0;
     border-radius: 10px;
     cursor: pointer;
     font-weight: 500;
     transition: all 0.3s;
     text-align: center;
+    color: #222;
+    font-size: 14px;
+    display: block;
+    width: 100%;
 }
 
 .quality-btn:hover {
     border-color: #667eea;
     background: #f0f3ff;
+    transform: scale(1.02);
 }
 
 .quality-btn.selected {
     border-color: #667eea;
     background: #667eea;
     color: white;
+}
+
+.quality-btn.selected:hover {
+    background: #5a67d8;
 }
 
 #download-btn {
@@ -185,5 +196,10 @@ button:disabled {
     
     .quality-grid {
         grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .quality-btn {
+        padding: 8px 6px;
+        font-size: 12px;
     }
 }

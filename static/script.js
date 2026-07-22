@@ -55,8 +55,9 @@ function displayVideoInfo(data) {
         const btn = document.createElement('button');
         const quality = format.quality;
         const size = format.filesize ? ` (${(format.filesize / (1024 * 1024)).toFixed(1)} MB)` : '';
+        const audio = format.has_audio ? ' 🎵' : ' 🎬';
         btn.className = 'quality-btn';
-        btn.textContent = quality + size;
+        btn.textContent = quality + audio + size;
         btn.dataset.formatId = format.format_id;
         
         btn.addEventListener('click', () => {

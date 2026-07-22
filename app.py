@@ -42,35 +42,62 @@ async def get_video_info(request: InfoRequest):
             'quiet': True,
             'no_warnings': True,
             'extract_flat': False,
+            'force_generic_extractor': False,
         }
         
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             
-            # Get available formats
+            # Get ALL formats
             formats = []
-            for f in info.get('formats', []):
-                if f.get('height') and f.get('ext') in ['mp4', 'webm']:
-                    formats.append({
-                        'quality': f"{f.get('height', '?')}p",
-                        'format_id': f['format_id'],
-                        'ext': f['ext'],
-                        'filesize': f.get('filesize', 0)
-                    })
+            seen_qualities = set()
             
-            # Remove duplicates (keep best quality per resolution)
-            seen = set()
-            unique_formats = []
-            for f in reversed(formats):  # Higher quality first
-                key = f['quality']
-                if key not in seen:
-                    seen.add(key)
-                    unique_formats.append(f)
+            for f in info.get('formats', []):
+                height = f.get('height')
+                ext = f.get('ext', '')
+                filesize = f.get('filesize', 0)
+                format_id = f['format_id']
+                acodec = f.get('acodec', 'none')
+                vcodec = f.get('vcodec', 'none')
+                
+                # Skip formats without video
+                if not height:
+                    continue
+                
+                # Skip formats that aren't mp4 (for better compatibility)
+                if ext not in ['mp4', 'webm']:
+                    continue
+                
+                quality_label = f"{height}p"
+                
+                # Skip duplicates (keep best quality per resolution)
+                if quality_label in seen_qualities:
+                    continue
+                    
+                seen_qualities.add(quality_label)
+                
+                # Check if this format has audio
+                has_audio = acodec != 'none'
+                
+                # Format note (like 720p, 1080p, etc.)
+                format_note = f.get('format_note', '')
+                
+                formats.append({
+                    'quality': quality_label,
+                    'format_id': format_id,
+                    'ext': ext,
+                    'filesize': filesize,
+                    'has_audio': has_audio,
+                    'format_note': format_note
+                })
+            
+            # Sort by quality (highest first)
+            formats.sort(key=lambda x: int(x['quality'].replace('p', '')), reverse=True)
             
             return {
                 "title": info.get('title', 'Unknown'),
                 "thumbnail": info.get('thumbnail', ''),
-                "formats": unique_formats
+                "formats": formats
             }
             
     except Exception as e:
