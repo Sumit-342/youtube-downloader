@@ -3,33 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Downloader</title>
+    <title>SnapDownload - YouTube Downloader</title>
     <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1>📥 YouTube Downloader</h1>
-        <p class="subtitle">Paste any YouTube URL and download in your quality</p>
-        
-        <div class="input-group">
-            <input type="text" id="url-input" placeholder="Paste YouTube URL here...">
-            <button id="fetch-btn">🔍 Get Video</button>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">⚡</span>
+                <span class="logo-text">SnapDownload</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#about">About</a>
+                <button class="nav-btn">⭐ Star on GitHub</button>
+            </div>
         </div>
-        
-        <div id="loading">
-            <div class="spinner"></div>
-            <div>Fetching video info...</div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-badge">
+                🎉 100% Free • No Signup Required
+            </div>
+            <h1 class="hero-title">
+                Download Any YouTube Video<br>
+                <span class="gradient-text">In Seconds</span>
+            </h1>
+            <p class="hero-subtitle">
+                Paste a link, pick your quality, and download. 
+                <span class="highlight">Video, audio, or subtitles.</span>
+            </p>
+            
+            <!-- Main Download Card -->
+            <div class="download-card">
+                <div class="input-wrapper">
+                    <div class="input-icon">🔗</div>
+                    <input type="text" id="url-input" placeholder="Paste YouTube link here...">
+                    <button id="fetch-btn" class="btn-primary">
+                        <span>Get Video</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="feature-badges">
+                    <span class="badge">🎬 MP4</span>
+                    <span class="badge">🎵 MP3</span>
+                    <span class="badge">✨ 4K Quality</span>
+                    <span class="badge">📱 Any Device</span>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading" class="loading-container">
+                <div class="spinner"></div>
+                <p>Fetching video info...</p>
+            </div>
+
+            <!-- Video Info -->
+            <div id="video-info" class="video-info">
+                <div class="video-preview">
+                    <img id="thumbnail" src="" alt="Video thumbnail">
+                    <div class="video-meta">
+                        <h3 id="video-title">Video Title</h3>
+                        <p id="video-duration">Duration: --</p>
+                    </div>
+                </div>
+                
+                <div class="quality-section">
+                    <div class="quality-header">
+                        <span>📀 Select Quality</span>
+                        <span class="quality-count" id="quality-count">0 formats</span>
+                    </div>
+                    <div class="quality-grid" id="quality-grid"></div>
+                </div>
+
+                <button id="download-btn" class="btn-download">
+                    <span>⬇️ Download Selected Quality</span>
+                </button>
+            </div>
+
+            <div id="error" class="error"></div>
         </div>
-        
-        <div id="video-info">
-            <img id="thumbnail" src="" alt="Video thumbnail">
-            <div id="video-title">Video Title</div>
-            <div class="quality-grid" id="quality-grid"></div>
-            <button id="download-btn">⬇️ Download Selected Quality</button>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="features-container">
+            <h2 class="section-title">Why <span class="gradient-text">SnapDownload</span>?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Lightning Fast</h3>
+                    <p>Ready in seconds, not minutes. No waiting around.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>100% Safe</h3>
+                    <p>No ads, no malware, no signups. Just pure downloads.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>Any Device</h3>
+                    <p>Works on mobile, tablet, laptop, or desktop.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>All Qualities</h3>
+                    <p>1080p, 4K, 60fps, and even audio-only MP3.</p>
+                </div>
+            </div>
         </div>
-        
-        <div id="error" class="error"></div>
-    </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <p>Built with ❤️ by <span class="gradient-text">You</span></p>
+            <p class="footer-sub">📥 YouTube Downloader • Open Source • Free Forever</p>
+        </div>
+    </footer>
 
     <script src="/static/script.js"></script>
 </body>
