@@ -77,6 +77,7 @@ async def get_video_info(request: InfoRequest):
             'quiet': True,
             'no_warnings': True,
             'extract_flat': False,
+            "impersonate" : "chrome-136",
             'force_generic_extractor': False,
         }
         
@@ -154,6 +155,7 @@ async def download_video(request: DownloadRequest):
             'outtmpl': filepath,
             'quiet': True,
             'no_warnings': True,
+            "impersonate" : "chrome-136",
             'progress_hooks': [lambda d: progress_hook(d, download_id)],
         }
         
