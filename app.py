@@ -62,28 +62,6 @@ def progress_hook(d, download_id):
 
 # ============ ROUTES ============
 
-
-import subprocess
-
-@app.on_event("startup")
-async def startup():
-    print("=" * 50)
-    print("Checking yt-dlp impersonation targets...")
-
-    result = subprocess.run(
-        ["yt-dlp", "--list-impersonate-targets"],
-        capture_output=True,
-        text=True
-    )
-
-    print("STDOUT:")
-    print(result.stdout)
-
-    print("STDERR:")
-    print(result.stderr)
-
-    print("=" * 50)
-
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     """Serve the main page"""
@@ -99,7 +77,6 @@ async def get_video_info(request: InfoRequest):
             'quiet': True,
             'no_warnings': True,
             'extract_flat': False,
-            "impersonate" : "chrome",
             'force_generic_extractor': False,
         }
         
@@ -177,7 +154,6 @@ async def download_video(request: DownloadRequest):
             'outtmpl': filepath,
             'quiet': True,
             'no_warnings': True,
-            "impersonate" : "chrome",
             'progress_hooks': [lambda d: progress_hook(d, download_id)],
         }
         
