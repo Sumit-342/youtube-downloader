@@ -78,7 +78,7 @@ async def get_video_info(request: InfoRequest):
             'no_warnings': True,
             'extract_flat': False,
             'force_generic_extractor': False,
-            "impersonate" : "Edge-101 ",
+            "impersonate" : "Edge-101",
         }
         
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -155,7 +155,7 @@ async def download_video(request: DownloadRequest):
             'outtmpl': filepath,
             'quiet': True,
             'no_warnings': True,
-            "impersonate" : "Edge-101 ",
+            "impersonate" : "Edge-101",
             'progress_hooks': [lambda d: progress_hook(d, download_id)],
         }
         
