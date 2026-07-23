@@ -132,33 +132,34 @@ async def get_video_info(request: InfoRequest):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+    
 @app.post("/api/download")
 async def download_video(request: DownloadRequest):
     """Download the video with selected quality"""
     try:
         url = request.url
         format_id = request.format_id
-        
+
         # Generate unique download ID
         download_id = str(uuid.uuid4())
-        
+
         # Generate unique filename
         filename = f"{uuid.uuid4().hex}.mp4"
         filepath = os.path.join(TEMP_FOLDER, filename)
-        
+
         # Initialize progress
         download_progress[download_id] = {'status': 'starting', 'percent': 0}
-        
+
         ydl_opts = {
             'format': f'{format_id}+bestaudio/best',
             'merge_output_format': 'mp4',
             'outtmpl': filepath,
             'quiet': True,
             'no_warnings': True,
-            "impersonate" : "Edge-101",
+            "impersonate": "Edge-101",
             'progress_hooks': [lambda d: progress_hook(d, download_id)],
         }
-        
+
         # Start download in a background thread
         def download_thread():
             try:
@@ -172,15 +173,25 @@ async def download_video(request: DownloadRequest):
                     'status': 'error',
                     'error': str(e)
                 }
-        
+
         thread = threading.Thread(target=download_thread)
         thread.daemon = True
         thread.start()
-        
+
         return {"download_id": download_id}
-        
+
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        import traceback
+        traceback.print_exc()
+        print("=" * 50)
+        print(type(e).__name__)
+        print(repr(e))
+        print("=" * 50)
+        raise HTTPException(
+            status_code=400,
+            detail=repr(e)
+        )
+
 
 @app.get("/api/progress/{download_id}")
 async def get_progress(download_id: str):
